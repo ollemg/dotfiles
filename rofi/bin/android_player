@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+## Author  : Aditya Shakya
+## Mail    : adi1090x@gmail.com
+## Github  : @adi1090x
+## Twitter : @adi1090x
+
+dir="$HOME/.config/rofi/applets/android"
+rofi_command="rofi -theme $dir/three.rasi"
+
+play_status_firefox=$(playerctl status --player=firefox)
+play_status_spotify=$(playerctl status --player=spotify)
+
+
+echo $play_status_spotify
+echo $play_status_firefox
+# Links
+exit="﬌"
+firefox=""
+spotify=""
+
+# Error msg
+msg() {
+	rofi -theme "$dir/message.rasi" -e "$1"
+}
+
+# Variable passed to rofi
+options="$exit\n$firefox\n$spotify"
+
+chosen="$(echo -e "$options" | $rofi_command -p "Most Used" -dmenu -selected-row 0)"
+case $chosen in
+    $exit)
+		exit 0
+        ;;
+    $firefox)
+		if [[ "$(playerctl status --player=firefox)" == "Playing" ]]; then
+			playerctl stop --player=firefox
+		else
+			msg "firefox"
+		fi
+        ;;
+    $spotify)
+		if [[ $play_status_spotify -eq "Paused" ]]; then
+			playerctl play --player=spotify
+			echo $play_status_spotify
+		else
+			msg "spotify $play_status_spotify"
+		fi
+        ;;
+esac
+
